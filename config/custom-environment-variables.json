@@ -1,0 +1,5 @@
+{
+    "dbConfig": {
+        "mongoURI": "WM_MONGO_URI"
+    }
+}

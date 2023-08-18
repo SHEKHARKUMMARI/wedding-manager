@@ -1,20 +1,23 @@
 const express = require("express");
-const app = express();
+const config = require("config");
 const mongoose = require("mongoose");
+const guests = require("./routes/guests");
+
+const app = express();
 const PORT = process.env.PORT || "2000";
+const dbConnectionString = config.get("dbConfig.mongoURI");
+
 mongoose
-  .connect(
-    `mongodb+srv://weddingmanager:weddingmanager@cluster-wedding-planer.gnukwke.mongodb.net/Weddings?retryWrites=true&w=majority`
-  )
+  .connect(dbConnectionString)
   .then(() => {
-    console.log("Connected  to mongodb");
+    console.log("Connected to mongodb");
   })
   .catch((err) => {
     console.log("FATAL:", err);
   });
-app.use("/", (req, res) => {
-  return res.send("Hello world");
-});
+
+app.use(express.json());
+app.use("/guests", guests);
 app.listen(PORT, () => {
   console.log(`connected to ${PORT}`);
 });
