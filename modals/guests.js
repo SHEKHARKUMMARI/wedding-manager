@@ -1,9 +1,19 @@
 const mongoose = require("mongoose");
+const Joi = require("joi");
 const Schema = mongoose.Schema;
-const ObjectId = Schema.ObjectId;
+
 const GuestSchema = new Schema({
   name: String,
   h_no: String,
 });
 const guest = mongoose.model("guest", GuestSchema);
-module.exports = { guest };
+
+const validateGuest = (data) => {
+  const guestValidationSchema = Joi.object({
+    name: Joi.string().min(3).required(),
+    h_no: Joi.string(),
+  });
+  return guestValidationSchema.validate(data);
+};
+
+module.exports = { guest, validateGuest };
