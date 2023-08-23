@@ -16,13 +16,11 @@ router.post("/", async (req, res) => {
     return res.status(400).send(error);
   }
   const { email, mobile, password } = payload;
-  const existingUser = await User.find({
+  const accounts = await User.find({
     $or: [{ email: email }, { mobile: mobile }],
   });
-  if (existingUser?.length) {
-    if (error) {
-      return res.status(400).send("Account already exist.");
-    }
+  if (accounts?.length) {
+    return res.status(400).send("Account already exist.");
   }
   try {
     const hashedPassword = await bcrypt.hash(
