@@ -24,5 +24,8 @@
     "joi": "^17.9.2",
     "jsonwebtoken": "^9.0.1",
     "mongoose": "^7.4.3"
+  },
+  "engines": {
+    "node": "~16.14.2"
   }
 }
