@@ -15,10 +15,20 @@ router.post("/", async (req, res) => {
   if (error) {
     return res.status(400).send(error);
   }
+  const { email, mobile, password } = payload;
+  const existingUser = await User.find({
+    $or: [{ email: email }, { mobile: mobile }],
+  });
+  if (existingUser?.length) {
+    if (error) {
+      return res.status(400).send("Account already exist.");
+    }
+  }
   try {
-    console.log("saltRounds", saltRounds);
-    const hashedPassword = await bcrypt.hash(payload.password, saltRounds);
-    console.log("hashedPassword", hashedPassword);
+    const hashedPassword = await bcrypt.hash(
+      password,
+      parseInt(saltRounds?.toString())
+    );
     const user = new User({ ...payload, password: hashedPassword });
     await user.save();
     const jwtToken = user.getJwtToken();
