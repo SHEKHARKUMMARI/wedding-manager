@@ -1,5 +1,7 @@
 {
     "dbConfig": {
-        "mongoURI": "mongodb://localhost:27017/weddingmanager"
+        "mongoURI": "mongodb://localhost:27017/weddingmanager",
+        "saltRounds": 10,
+        "jwtSecretKey": "FAKEKEY"
     }
 }

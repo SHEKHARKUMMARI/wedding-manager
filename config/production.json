@@ -1,5 +1,7 @@
 {
     "dbConfig": {
-        "mongoURI": ""
+        "mongoURI": "",
+        "saltRounds": "",
+        "jwtSecretKey": ""
     }
 }
