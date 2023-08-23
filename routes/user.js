@@ -16,7 +16,9 @@ router.post("/", async (req, res) => {
     return res.status(400).send(error);
   }
   try {
+    console.log("saltRounds", saltRounds);
     const hashedPassword = await bcrypt.hash(payload.password, saltRounds);
+    console.log("hashedPassword", hashedPassword);
     const user = new User({ ...payload, password: hashedPassword });
     await user.save();
     const jwtToken = user.getJwtToken();
