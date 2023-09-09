@@ -27,11 +27,12 @@ router.post("/", auth, async (req, res) => {
   const filePath = path.join(__dirname, "../mails/index.html");
   const file = fs.readFileSync(filePath).toString();
   const user = req.user;
+  const { to } = req.body;
   const template = handlebar.compile(file);
   const mailTemplate = template({ invitee: user?.surname + " " + user?.name });
   const mailOptions = {
     from: smtpUser,
-    to: "shekharkummari0@gmail.com",
+    to: to,
     subject: "Invitation",
     html: mailTemplate,
   };
