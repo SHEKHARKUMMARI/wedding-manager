@@ -3,5 +3,12 @@
         "mongoURI": "WM_MONGO_URI",
         "saltRounds": "WM_SALT_ROUNDS",
         "jwtSecretKey": "WM_SECRETE_KEY"
+    },
+    "smtpConfig": {
+        "userName": "WM_SMTP_USER_NAME",
+        "passWord": "WM_SMTP_PASSWORD",
+        "server": "WM_SMTP_SERVER",
+        "port": "WM_SMTP_PORT",
+        "security": "WM_SMTP_PORT"
     }
 }

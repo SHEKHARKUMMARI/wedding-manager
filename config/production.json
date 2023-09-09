@@ -3,5 +3,12 @@
         "mongoURI": "",
         "saltRounds": "",
         "jwtSecretKey": ""
+    },
+    "smtpConfig": {
+        "userName": "durgamsoundarya0@gmail.com",
+        "passWord": "qeqnzzzxuzfftsgc",
+        "server": "smtp.gmail.com",
+        "port": "465",
+        "security": "SSL"
     }
 }

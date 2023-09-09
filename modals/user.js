@@ -30,6 +30,8 @@ userSchema.methods.getJwtToken = function () {
     {
       id: this._id,
       role: this.role,
+      name: this.name,
+      surname: this.surname,
     },
     jwtSecreteKey
   );

@@ -3,5 +3,12 @@
         "mongoURI": "mongodb://localhost:27017/weddingmanager",
         "saltRounds": 10,
         "jwtSecretKey": "FAKEKEY"
+    },
+    "smtpConfig": {
+        "userName": "durgamsoundarya0@gmail.com",
+        "passWord": "qeqnzzzxuzfftsgc",
+        "server": "smtp.gmail.com",
+        "port": "465",
+        "security": "SSL"
     }
 }
