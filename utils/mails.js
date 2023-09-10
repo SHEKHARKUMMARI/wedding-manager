@@ -4,15 +4,11 @@ const handlebar = require("handlebars");
 const fs = require("fs");
 const nodemailer = require("nodemailer");
 const config = require("config");
-const { Types } = require("mongoose");
-const { auth } = require("../middleware/authorization");
-const { User } = require("../modals/user");
 
 const smtpUser = config.get("smtpConfig.userName");
 const smtpPassword = config.get("smtpConfig.passWord");
 const smtpHost = config.get("smtpConfig.server");
 const smtpPort = config.get("smtpConfig.port");
-const router = express.Router();
 
 const transporter = nodemailer.createTransport({
   service: "gmail",
@@ -25,25 +21,45 @@ const transporter = nodemailer.createTransport({
   },
 });
 
-router.post("/", auth, async (req, res) => {
-  const filePath = path.join(__dirname, "../mails/index.html");
+const registerUser = async (userEmail) => {
+  const filePath = path.join(__dirname, "../mails/templates/index.html");
   const file = fs.readFileSync(filePath).toString();
-  const user = req.user;
-  const { to } = req.body;
   const template = handlebar.compile(file);
   const mailTemplate = template({ invitee: user?.surname + " " + user?.name });
   const mailOptions = {
     from: smtpUser,
-    to: to,
+    to: userEmail,
     subject: "Invitation",
     html: mailTemplate,
   };
   try {
     await transporter.sendMail(mailOptions);
-    return res.status(200).send("Email submitted successfull");
+    return "Email submitted successfull";
   } catch (err) {
-    return res.status(500).send(err);
+    return "Error while Inviting";
   }
-});
+};
+const weddingInvitation = async ({ invitee, invitor }) => {
+  const filePath = path.join(
+    __dirname,
+    "../mails/templates/wedding-invitation.html"
+  );
+  const file = fs.readFileSync(filePath).toString();
+  const template = handlebar.compile(file);
+  const templateVariables = {
+    invitee: `${invitee?.name} ${invitee.surname}`,
+    invitor: `${invitor?.name} ${invitor.surname}`,
+  };
 
-module.exports = router;
+  const mailTemplate = template(templateVariables);
+  const mailOptions = {
+    from: smtpUser,
+    to: invitee.email,
+    subject: "Invitation",
+    html: mailTemplate,
+  };
+
+  await transporter.sendMail(mailOptions);
+  return "Email submitted successfull";
+};
+module.exports = { registerUser, weddingInvitation };

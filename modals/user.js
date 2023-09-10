@@ -2,6 +2,7 @@ const mongoose = require("mongoose");
 const Joi = require("joi");
 const jwt = require("jsonwebtoken");
 const config = require("config");
+const { Wedding } = require("../modals/wedding");
 
 const jwtSecreteKey = config.get("dbConfig.jwtSecretKey");
 
@@ -15,13 +16,14 @@ const userSchema = new Schema({
   email: { type: String, required: true },
   password: { type: String, required: true },
   role: { type: String, require: true, default: "Customer" },
-  my_weddings: [{ type: [Schema.ObjectId], ref: "Wedding" }],
-  weddings: [{ type: [Schema.ObjectId], ref: "Wedding" }],
+  my_weddings: [{ type: Schema.ObjectId, ref: Wedding }],
+  weddings: [{ type: Schema.ObjectId, ref: Wedding }],
+  approval_pending_weddings: [{ type: Schema.ObjectId, ref: Wedding }],
   h_no: { type: String, require: true },
   created_on: { type: Date, default: Date.now },
   updated_on: { type: Date, default: Date.now },
-  father: { type: String, require: true },
-  mother: { type: String, require: true },
+  father: { type: Schema.ObjectId, ref: "User" },
+  mother: { type: Schema.ObjectId, ref: "User" },
   access: { type: String },
 });
 
@@ -56,8 +58,8 @@ const validateUser = (data) => {
     my_weddings: Joi.array().items(Joi.string()),
     weddings: Joi.array().items(Joi.string()),
     h_no: Joi.string().required(),
-    father: Joi.string().min(5).max(20).required(),
-    mother: Joi.string().min(5).max(20).required(),
+    mother: Joi.string(),
+    father: Joi.string(),
     access: Joi.string(),
   }).with("password", "repeat_password");
   return user.validate(data, { abortEarly: false });

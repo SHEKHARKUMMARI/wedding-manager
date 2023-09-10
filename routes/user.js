@@ -1,6 +1,7 @@
 const express = require("express");
 const bcrypt = require("bcrypt");
 const config = require("config");
+const { Types } = require("mongoose");
 const { auth } = require("../middleware/authorization");
 const { User, validateUser } = require("../modals/user");
 
@@ -27,7 +28,16 @@ router.post("/", async (req, res) => {
       password,
       parseInt(saltRounds?.toString())
     );
-    const user = new User({ ...payload, password: hashedPassword });
+    const user = new User({
+      ...payload,
+      password: hashedPassword,
+      ...(payload.mother
+        ? { mother: new Types.ObjectId(payload?.mother.toString()) }
+        : {}),
+      ...(payload.father
+        ? { father: new Types.ObjectId(payload?.father.toString()) }
+        : {}),
+    });
     await user.save();
     const jwtToken = user.getJwtToken();
     return res
