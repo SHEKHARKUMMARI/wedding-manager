@@ -28,15 +28,27 @@ router.post("/", async (req, res) => {
       password,
       parseInt(saltRounds?.toString())
     );
+    const children = payload.family?.children?.map((member) => {
+      return new Types.ObjectId(member?.child?.toString());
+    });
     const user = new User({
       ...payload,
       password: hashedPassword,
-      ...(payload.mother
-        ? { mother: new Types.ObjectId(payload?.mother.toString()) }
-        : {}),
-      ...(payload.father
-        ? { father: new Types.ObjectId(payload?.father.toString()) }
-        : {}),
+      family: {
+        ...(payload.family?.mother
+          ? { mother: new Types.ObjectId(payload.family?.mother.toString()) }
+          : {}),
+        ...(payload?.family?.father
+          ? { father: new Types.ObjectId(payload?.family?.father.toString()) }
+          : {}),
+        ...(payload.family?.wife
+          ? { wife: new Types.ObjectId(payload.family?.wife.toString()) }
+          : {}),
+        ...(payload.family?.husband
+          ? { husband: new Types.ObjectId(payload.family?.husband.toString()) }
+          : {}),
+        ...(payload.family?.children ? { children: children } : {}),
+      },
     });
     await user.save();
     const jwtToken = user.getJwtToken();

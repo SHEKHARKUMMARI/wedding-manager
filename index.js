@@ -21,11 +21,24 @@ mongoose
   });
 
 app.use(express.json());
-app.use("/guests", guests);
-app.use("/user", user);
-app.use("/weddings", weddings);
-app.use("/login", login);
-app.use("/mails", mails);
+app.use((req, res, next) => {
+  res.header("Access-Control-Allow-Origin", "*");
+  res.header(
+    "Access-Control-Allow-Headers",
+    "Origin, X-Requested-With, Content-Type, Accept, Authorization"
+  );
+  if (req.method == "OPTIONS") {
+    res.header("Access-Control-Allow-Methods", "PUT, POST, PATCH, DELETE, GET");
+    return res.status(200).json({});
+  }
+
+  next();
+});
+app.use("/v1/guests", guests);
+app.use("/v1/user", user);
+app.use("/v1/weddings", weddings);
+app.use("/v1/login", login);
+app.use("/v1/mails", mails);
 
 app.listen(PORT, () => {
   console.log(`connected to ${PORT}`);

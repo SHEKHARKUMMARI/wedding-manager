@@ -11,6 +11,7 @@ const { Schema, model } = mongoose;
 const userSchema = new Schema({
   name: { type: String, require: true },
   surname: { type: String, require: true },
+  gender: { type: String, require: true },
   place: { type: String, require: true },
   mobile: { type: String, require: true },
   email: { type: String, required: true },
@@ -22,8 +23,14 @@ const userSchema = new Schema({
   h_no: { type: String, require: true },
   created_on: { type: Date, default: Date.now },
   updated_on: { type: Date, default: Date.now },
-  father: { type: Schema.ObjectId, ref: "User" },
-  mother: { type: Schema.ObjectId, ref: "User" },
+  family: {
+    father: { type: Schema.ObjectId, ref: "User" },
+    mother: { type: Schema.ObjectId, ref: "User" },
+    wife: { type: Schema.ObjectId, ref: "User" },
+    husband: { type: Schema.ObjectId, ref: "User" },
+    children: [{ type: Schema.ObjectId, ref: "User" }],
+  },
+
   access: { type: String },
 });
 
@@ -46,6 +53,7 @@ const validateUser = (data) => {
     surname: Joi.string().min(3).max(20).required(),
     mobile: Joi.string().min(2).max(20).required(),
     password: Joi.string().min(2).max(20).required(),
+    gender: Joi.string().valid("male", "female").required(),
     repeat_password: Joi.ref("password"),
     email: Joi.string()
       .email({
@@ -54,12 +62,16 @@ const validateUser = (data) => {
       })
       .required(),
     place: Joi.string().min(5).max(20).required(),
+    family: Joi.object({
+      father: Joi.string().allow(null, ""),
+      mother: Joi.string().allow(null, ""),
+      wife: Joi.string().allow(null, ""),
+      children: Joi.array().items(Joi.string().allow(null, "")),
+    }),
     role: Joi.string().min(5).max(20),
     my_weddings: Joi.array().items(Joi.string()),
     weddings: Joi.array().items(Joi.string()),
     h_no: Joi.string().required(),
-    mother: Joi.string(),
-    father: Joi.string(),
     access: Joi.string(),
   }).with("password", "repeat_password");
   return user.validate(data, { abortEarly: false });
