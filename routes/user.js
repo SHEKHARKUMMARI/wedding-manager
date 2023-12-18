@@ -60,7 +60,7 @@ router.post("/", async (req, res) => {
   }
 });
 
-router.get("/lookup", auth, async (req, res) => {
+router.get("/lookup", async (req, res) => {
   const { q } = req.query;
   const queryRegex = new RegExp(q);
   const users = await User.find({

@@ -65,6 +65,7 @@ const validateUser = (data) => {
     family: Joi.object({
       father: Joi.string().allow(null, ""),
       mother: Joi.string().allow(null, ""),
+      husband: Joi.string().allow(null, ""),
       wife: Joi.string().allow(null, ""),
       children: Joi.array().items(Joi.string().allow(null, "")),
     }),
