@@ -50,11 +50,13 @@ router.post("/", async (req, res) => {
         ...(payload.family?.children ? { children: children } : {}),
       },
     });
-    await user.save();
+    const newUser = await user.save();
     const jwtToken = user.getJwtToken();
-    return res
-      .header("X-Auth-Token", jwtToken)
-      .send(`Account is created successfully`);
+    return res.header("X-Auth-Token", jwtToken).json({
+      name: newUser?.name,
+      surname: newUser?.surname,
+      id: newUser?._id,
+    });
   } catch (ex) {
     return res.status(500).send(ex);
   }
