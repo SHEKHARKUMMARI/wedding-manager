@@ -26,6 +26,6 @@ router.post("/", async (req, res) => {
   const jwtToken = user.getJwtToken();
   return res
     .header("X-Auth-Token", jwtToken)
-    .send(`Hi ${user.name} you are loged in successfully`);
+    .json({ name: user?.name, surname: user?.surname, id: user?._id });
 });
 module.exports = router;
