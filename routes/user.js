@@ -1,6 +1,7 @@
 const express = require("express");
 const bcrypt = require("bcrypt");
 const config = require("config");
+const _ = require("lodash");
 const { Types } = require("mongoose");
 const { auth } = require("../middleware/authorization");
 const { User, validateUser } = require("../modals/user");
@@ -59,6 +60,22 @@ router.post("/", async (req, res) => {
     });
   } catch (ex) {
     return res.status(500).send(ex);
+  }
+});
+
+router.get("/", auth, async (req, res) => {
+  const userId = new Types.ObjectId(req?.user?.id);
+
+  if (!userId)
+    return res
+      .status(400)
+      .send({ message: "User doesnot exist , Please SignUp." });
+  try {
+    const userData = await User.findById(userId);
+    const user = _.omit(userData?.toObject(), ["password", "__v"]);
+    return res.status(200).send(user);
+  } catch (err) {
+    return res.status(400).send(err);
   }
 });
 

@@ -8,7 +8,7 @@ const { Schema, model } = mongoose;
 const weddingSchema = new Schema({
   title: { type: String, required: true },
   bribe: { type: Schema.ObjectId, ref: "User", required: true },
-  groom: { type: Schema.ObjectId, ref: " User ", required: true },
+  groom: { type: Schema.ObjectId, ref: "User", required: true },
   food_gallery: [{ type: Schema.ObjectId, ref: Dish }],
   photo_gallery: [{ type: Schema.ObjectId, ref: Photo }],
   pending_invitations: [{ type: Schema.ObjectId, ref: "User" }],
@@ -16,7 +16,7 @@ const weddingSchema = new Schema({
   wedding_date: { type: Date, required: true },
   avenue: { type: String, required: true },
   time_table: { type: String },
-  created_by: { type: Schema.ObjectId, ref: " User " },
+  created_by: { type: Schema.ObjectId, ref: "User" },
   created_on: { type: Date, default: Date.now() },
   updated_on: { type: Date, default: Date.now() },
 });

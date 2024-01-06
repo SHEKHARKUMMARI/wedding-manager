@@ -14,18 +14,6 @@ router.get("/", auth, async (req, res) => {
   return res.status(200).send(weddings);
 });
 
-router.get("/me", auth, async (req, res) => {
-  const { user } = req;
-
-  try {
-    const id = new Types.ObjectId(user?.id);
-    const weddings = await User.findById(id)?.populate("weddings").exec();
-    return res.status(200).send(weddings);
-  } catch (ex) {
-    return res.status(500).send(ex);
-  }
-});
-
 router.post("/", auth, async (req, res) => {
   const payload = req.body;
   const { user } = req;
@@ -53,6 +41,26 @@ router.post("/", auth, async (req, res) => {
   await currentUser.save();
 
   return res.status(200).send(savedWedding);
+});
+
+router.get("/my-weddings", auth, async (req, res) => {
+  const { user } = req;
+
+  try {
+    const id = new Types.ObjectId(user?.id);
+    const userData = await User.findById(id)
+      .populate({
+        path: "my_weddings",
+        populate: {
+          path: "bribe groom",
+          model: User,
+        },
+      })
+      .exec();
+    return res.status(200).send(userData?.my_weddings);
+  } catch (ex) {
+    return res.status(500).send(ex);
+  }
 });
 
 router.put("/invite", auth, async (req, res) => {
