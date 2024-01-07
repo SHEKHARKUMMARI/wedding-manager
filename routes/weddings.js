@@ -14,7 +14,7 @@ router.get("/", auth, async (req, res) => {
   const weddings = await Wedding.find();
   return res.status(200).send(weddings);
 });
-router.get("/public", auth, async (req, res) => {
+router.get("/public", async (req, res) => {
   const weddings = await Wedding.find({ is_public: true })?.populate([
     {
       path: "bribe groom",
