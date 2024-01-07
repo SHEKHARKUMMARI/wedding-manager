@@ -4,7 +4,6 @@ const Joi = require("joi");
 const photoSchema = new Schema({
   title: {
     type: String,
-    require: true,
   },
   url: {
     type: String,
@@ -12,11 +11,11 @@ const photoSchema = new Schema({
   },
   type: {
     type: String,
+    enum: ["wedding", "food"],
     require: true,
   },
   is_public: {
     type: Boolean,
-    require: true,
   },
   created_by: {
     type: String,
@@ -25,16 +24,33 @@ const photoSchema = new Schema({
     type: String,
     default: Date.now(),
   },
+  upadated_by: {
+    type: String,
+  },
+  updated_on: {
+    type: String,
+    default: Date.now(),
+  },
+});
+photoSchema.pre("updateOne", function (next) {
+  this.set({ updated_on: Date.now() });
+  next();
 });
 const Photo = model("photo", photoSchema);
+const photoValidator = Joi.object({
+  title: Joi.string(),
+  url: Joi.string().required(),
+  type: Joi.string().valid("wedding", "food").required(),
+  is_public: Joi.boolean(),
+  id: Joi.string(),
+});
+const validatePhotoGallery = (data) => {
+  const photo = Joi.array().items(photoValidator);
+  return photo.validate(data, { abortEarly: false });
+};
 const validatePhoto = (data) => {
-  const photo = Joi.object({
-    title: Joi.string().required().min(5),
-    url: Joi.string().required(),
-    type: Joi.string().required(),
-    is_public: Joi.boolean().required(),
-  });
+  const photo = photoValidator;
   return photo.validate(data, { abortEarly: false });
 };
 
-module.exports = { validatePhoto, Photo };
+module.exports = { validatePhotos: validatePhotoGallery, validatePhoto, Photo };

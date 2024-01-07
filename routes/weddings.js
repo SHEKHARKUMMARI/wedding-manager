@@ -3,6 +3,7 @@ const mongoose = require("mongoose");
 const { Types } = mongoose;
 const router = express.Router();
 const { Wedding, validateWedding } = require("../modals/wedding");
+const { Photo, validatePhotos } = require("../modals/photo");
 const { User } = require("../modals/user");
 const { auth } = require("../middleware/authorization");
 const { weddingInvitation } = require("../utils/mails");
@@ -13,33 +14,53 @@ router.get("/", auth, async (req, res) => {
   const weddings = await Wedding.find();
   return res.status(200).send(weddings);
 });
+router.get("/public", auth, async (req, res) => {
+  const weddings = await Wedding.find({ is_public: true })?.populate([
+    {
+      path: "bribe groom",
+      select: "-password",
+      model: User,
+    },
+    {
+      path: "photo_gallery",
+      model: Photo,
+    },
+  ]);
+  return res.status(200).send(weddings);
+});
 
 router.post("/", auth, async (req, res) => {
   const payload = req.body;
+  const { photo_gallery, ...weddingDetails } = payload || {};
   const { user } = req;
-  const { error } = validateWedding(payload);
-  if (error) {
-    return res.status(400).send(error);
+  const { error: weddingError } = validateWedding(weddingDetails);
+  const { error: galleryError } = validatePhotos(photo_gallery);
+  if (weddingError || galleryError) {
+    return res
+      .status(400)
+      .send({ weeding: weddingError, photos: galleryError });
   }
+
   const groomId = new Types.ObjectId(payload?.groom?.toString());
   const bribeId = new Types.ObjectId(payload?.bribe?.toString());
   const userId = new Types.ObjectId(user?.id?.toString());
+  const savedPhotos = await Photo.insertMany(photo_gallery);
+  const savedPhotosIds = savedPhotos?.map((photo) => photo._id);
 
   const wedding = new Wedding({
     ...payload,
     groom: groomId,
     bribe: bribeId,
     created_by: userId,
+    photo_gallery: savedPhotosIds,
   });
   const savedWedding = await wedding.save();
-
   const currentUser = await User.findById(userId);
   currentUser.my_weddings = [
     ...(currentUser?.my_weddings || []),
     savedWedding?._id,
   ];
   await currentUser.save();
-
   return res.status(200).send(savedWedding);
 });
 
@@ -49,13 +70,22 @@ router.get("/my-weddings", auth, async (req, res) => {
   try {
     const id = new Types.ObjectId(user?.id);
     const userData = await User.findById(id)
-      .populate({
-        path: "my_weddings",
-        populate: {
-          path: "bribe groom",
-          model: User,
+      .populate([
+        {
+          path: "my_weddings",
+          populate: [
+            {
+              path: "bribe groom",
+              model: User,
+              select: "-password",
+            },
+            {
+              path: "photo_gallery",
+              model: Photo,
+            },
+          ],
         },
-      })
+      ])
       .exec();
     return res.status(200).send(userData?.my_weddings);
   } catch (ex) {

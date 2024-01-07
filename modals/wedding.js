@@ -19,6 +19,7 @@ const weddingSchema = new Schema({
   created_by: { type: Schema.ObjectId, ref: "User" },
   created_on: { type: Date, default: Date.now() },
   updated_on: { type: Date, default: Date.now() },
+  is_public: { type: Boolean, default: false },
 });
 
 const Wedding = model("wedding", weddingSchema);
@@ -30,6 +31,7 @@ const validateWedding = (data) => {
     groom: Joi.string().required(),
     wedding_date: Joi.date().required(),
     avenue: Joi.string().required(),
+    is_public: Joi.boolean(),
   });
   return wedding.validate(data, { abortEarly: false });
 };
