@@ -4,6 +4,7 @@ const handlebar = require("handlebars");
 const fs = require("fs");
 const nodemailer = require("nodemailer");
 const config = require("config");
+const { formateDateToLocaleDateString } = require("./date");
 
 const smtpUser = config.get("smtpConfig.userName");
 const smtpPassword = config.get("smtpConfig.passWord");
@@ -39,27 +40,38 @@ const registerUser = async (userEmail) => {
     return "Error while Inviting";
   }
 };
-const weddingInvitation = async ({ invitee, invitor }) => {
+const weddingInvitation = async ({ wedding, guest_email, invitee_email }) => {
   const filePath = path.join(
     __dirname,
     "../mails/templates/wedding-invitation.html"
   );
   const file = fs.readFileSync(filePath).toString();
   const template = handlebar.compile(file);
+
+  const currentDate = new Date();
+  const tenDaysLater = new Date();
+  tenDaysLater.setDate(currentDate.getDate() + 10);
+
   const templateVariables = {
-    invitee: `${invitee?.name} ${invitee.surname}`,
-    invitor: `${invitor?.name} ${invitor.surname}`,
+    groom: `${wedding?.groom?.surname} ${wedding?.groom?.name}`,
+    bride: `${wedding?.bribe?.surname} ${wedding?.bribe?.name}`,
+    wedding_date: `${formateDateToLocaleDateString(wedding?.wedding_date)}`,
+    venue: `${wedding?.avenue}`,
+    rsvp_date: `${formateDateToLocaleDateString(tenDaysLater)}`,
   };
 
   const mailTemplate = template(templateVariables);
   const mailOptions = {
-    from: smtpUser,
-    to: invitee.email,
-    subject: "Invitation",
+    from: invitee_email,
+    to: guest_email,
+    subject: "Wedding Invitation",
     html: mailTemplate,
   };
-
-  await transporter.sendMail(mailOptions);
-  return "Email submitted successfull";
+  try {
+    const req = await transporter.sendMail(mailOptions);
+    return req;
+  } catch (err) {
+    return err;
+  }
 };
 module.exports = { registerUser, weddingInvitation };

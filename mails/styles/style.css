@@ -1,20 +1,78 @@
-/* padding  */
-.p-1-2 {
-    padding: 50% !important;
-}
-
-.px-1-5 {
-    padding-inline: 20%;
-}
-
-/* custome styles */
-.wedding-invitation {
+body {
+    margin: 0;
+    padding: 0;
+    font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
+    background: url("https://res.cloudinary.com/shekhar-kummari/image/upload/v1704718077/9983274_qyhpqe.jpg") no-repeat center center fixed;
+    background-size: cover;
+    height: 100vh;
     display: flex;
     align-items: center;
-    flex-direction: column;
+    justify-content: center;
+    color: #fff;
 }
 
-.accept-button {
-    background-color: #00FFFF;
-    box-shadow: none;
+.invitation {
+    text-align: center;
+    padding: 30px;
+    border-radius: 10px;
+    max-width: 600px;
+    width: 100%;
+}
+
+h1 {
+    font-size: 2.5em;
+    margin-bottom: 10px;
+    letter-spacing: 2px;
+}
+
+p {
+    font-size: 1.2em;
+    margin-bottom: 20px;
+    line-height: 1.5;
+}
+
+.date {
+    font-size: 1.5em;
+    margin-bottom: 10px;
+}
+
+.venue {
+    font-size: 1.3em;
+    margin-bottom: 20px;
+}
+
+.rsvp {
+    font-size: 1.2em;
+}
+
+a {
+    color: #ffd700;
+    text-decoration: none;
+    font-weight: bold;
+}
+
+.accept_button {
+    background-color: black;
+    color: #fff;
+    /* Text color */
+    padding: 10px 20px;
+    /* Adjust padding as needed */
+    font-size: 1em;
+    /* Adjust font size as needed */
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+}
+
+.accept_button:hover {
+    background-color: #ad2b48;
+    /* Adjust hover color if needed */
+}
+
+.respond_container {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    margin-top: 10px;
 }

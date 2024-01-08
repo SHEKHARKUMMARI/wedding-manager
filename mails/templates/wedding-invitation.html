@@ -4,16 +4,100 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Wedding Invitation</title>
-    <link rel="stylesheet" href="../styles/style.css" />
   </head>
-  <body>
-    <div class="wedding-invitation">
-      <div>
-        <h1>Hi {{invitee}}</h1>
-        <div>Accept Wedding Invitation from</div>
-        <h1>{{invitor}}</h1>
-        <button class="accept-button">Accept Invitation</button>
-      </div>
-    </div>
+  <body
+    style="
+      margin: 0;
+      padding: 0;
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      height: 100vh;
+    "
+  >
+    <!-- Outer table for background image -->
+    <table
+      width="100%"
+      cellpadding="0"
+      cellspacing="0"
+      border="0"
+      style="
+        background: url('https://res.cloudinary.com/shekhar-kummari/image/upload/v1704718077/9983274_qyhpqe.jpg')
+          no-repeat center center fixed;
+        background-size: cover;
+      "
+    >
+      <tr>
+        <td align="center">
+          <!-- Inner table for content -->
+          <table
+            width="100%"
+            cellpadding="0"
+            cellspacing="0"
+            border="0"
+            style="max-width: 600px; margin: 0 auto; border-radius: 10px"
+          >
+            <tr>
+              <td align="center" style="text-align: center; padding: 30px">
+                <h1
+                  style="
+                    font-size: 2.5em;
+                    margin-bottom: 10px;
+                    letter-spacing: 2px;
+                  "
+                >
+                  Wedding Invitation
+                </h1>
+                <p
+                  style="
+                    font-size: 1.2em;
+                    margin-bottom: 20px;
+                    line-height: 1.5;
+                  "
+                >
+                  You are cordially invited to celebrate the union of
+                </p>
+                <h1
+                  style="
+                    font-size: 2.5em;
+                    margin-bottom: 10px;
+                    letter-spacing: 2px;
+                  "
+                >
+                  {{groom}} & {{bride}}
+                </h1>
+                <p class="date" style="font-size: 1.5em; margin-bottom: 10px">
+                  Date: {{wedding_date}}
+                </p>
+                <p class="venue" style="font-size: 1.3em; margin-bottom: 20px">
+                  Venue: {{venue}}
+                </p>
+                <p class="rsvp" style="font-size: 1.2em">
+                  Please RSVP by {{rsvp_date}}. <br />
+                  We look forward to celebrating with you!
+                </p>
+
+                <div style="margin: 10px auto; margin-top: 10px">
+                  <a
+                    href="https://wedding-manager-web-wm.vercel.app/"
+                    style="
+                      background-color: black;
+                      color: #fff;
+                      padding: 10px 20px;
+                      font-size: 1em;
+                      border: none;
+                      border-radius: 5px;
+                      cursor: pointer;
+                      transition: background-color 0.3s ease;
+                    "
+                    onmouseover="this.style.backgroundColor='#ad2b48'"
+                    onmouseout="this.style.backgroundColor='black'"
+                    >Respond</a
+                  >
+                </div>
+              </td>
+            </tr>
+          </table>
+        </td>
+      </tr>
+    </table>
   </body>
 </html>

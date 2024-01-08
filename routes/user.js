@@ -64,8 +64,7 @@ router.post("/", async (req, res) => {
 });
 
 router.get("/", auth, async (req, res) => {
-  const userId = new Types.ObjectId(req?.user?.id);
-
+  const userId = new Types.ObjectId(req?.user?.id?.trim());
   if (!userId)
     return res
       .status(400)

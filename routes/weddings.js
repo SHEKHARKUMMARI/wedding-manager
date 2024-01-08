@@ -8,12 +8,36 @@ const { User } = require("../modals/user");
 const { auth } = require("../middleware/authorization");
 const { weddingInvitation } = require("../utils/mails");
 
-// get all wedding
-
 router.get("/", auth, async (req, res) => {
   const weddings = await Wedding.find();
   return res.status(200).send(weddings);
 });
+
+router.get("/my-wedding/:id", auth, async (req, res) => {
+  const { id } = req.params || {};
+  if (!id) {
+    return res.status(400).send("Wedding Not Found");
+  }
+  const weddingID = new Types.ObjectId(id);
+  try {
+    const wedding = await Wedding.findById(weddingID).populate([
+      {
+        path: "bribe groom",
+        model: User,
+        select: "-password",
+      },
+      {
+        path: "photo_gallery",
+        model: Photo,
+      },
+    ]);
+    if (!wedding) return res.status(400).send("please create  wedding");
+    return res.status(200).send(wedding);
+  } catch (err) {
+    res.status(500).send(err);
+  }
+});
+
 router.get("/public", async (req, res) => {
   const weddings = await Wedding.find({ is_public: true })?.populate([
     {

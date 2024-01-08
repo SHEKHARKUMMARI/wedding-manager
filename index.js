@@ -6,6 +6,7 @@ const user = require("./routes/user");
 const weddings = require("./routes/weddings");
 const login = require("./routes/login");
 const mails = require("./routes/mails");
+const invitation = require("./routes/invitation");
 
 const app = express();
 const PORT = process.env.PORT || "2000";
@@ -39,6 +40,7 @@ app.use("/v1/user", user);
 app.use("/v1/weddings", weddings);
 app.use("/v1/login", login);
 app.use("/v1/mails", mails);
+app.use("/v1/invitation", invitation);
 
 app.listen(PORT, () => {
   console.log(`connected to ${PORT}`);
