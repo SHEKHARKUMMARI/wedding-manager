@@ -32,5 +32,14 @@ const validateInvitation = (data) => {
   });
   return invitation.validate(data, { abortEarly: false });
 };
+const validateStatusUpdation = (data) => {
+  const invitation = Joi.object({
+    reason: Joi.string(),
+    status: Joi.string()
+      .valid("invited", "accepted", "rejected", "")
+      .required(),
+  });
+  return invitation.validate(data, { abortEarly: false });
+};
 
-module.exports = { Invitation, validateInvitation };
+module.exports = { Invitation, validateInvitation, validateStatusUpdation };

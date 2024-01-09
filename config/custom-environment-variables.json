@@ -10,5 +10,8 @@
         "server": "WM_SMTP_SERVER",
         "port": "WM_SMTP_PORT",
         "security": "WM_SMTP_PORT"
+    },
+    "fe": {
+        "website_url": "WM_WEB_URL"
     }
 }

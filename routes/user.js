@@ -5,6 +5,7 @@ const _ = require("lodash");
 const { Types } = require("mongoose");
 const { auth } = require("../middleware/authorization");
 const { User, validateUser } = require("../modals/user");
+const { Invitation } = require("../modals/invitation");
 
 const router = express.Router();
 
@@ -52,6 +53,15 @@ router.post("/", async (req, res) => {
       },
     });
     const newUser = await user.save();
+    try {
+      await Invitation?.updateMany(
+        { email: email },
+        { $set: { guest_id: newUser?._id } }
+      );
+    } catch (error) {
+      console.log(error);
+    }
+
     const jwtToken = user.getJwtToken();
     return res.header("X-Auth-Token", jwtToken).json({
       name: newUser?.name,

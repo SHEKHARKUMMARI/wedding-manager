@@ -13,7 +13,7 @@ router.get("/", auth, async (req, res) => {
   return res.status(200).send(weddings);
 });
 
-router.get("/my-wedding/:id", auth, async (req, res) => {
+router.get("/my-wedding/:id", async (req, res) => {
   const { id } = req.params || {};
   if (!id) {
     return res.status(400).send("Wedding Not Found");

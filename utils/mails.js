@@ -40,7 +40,12 @@ const registerUser = async (userEmail) => {
     return "Error while Inviting";
   }
 };
-const weddingInvitation = async ({ wedding, guest_email, invitee_email }) => {
+const weddingInvitation = async ({
+  wedding,
+  guest_email,
+  invitee_email,
+  wedding_url,
+}) => {
   const filePath = path.join(
     __dirname,
     "../mails/templates/wedding-invitation.html"
@@ -58,6 +63,7 @@ const weddingInvitation = async ({ wedding, guest_email, invitee_email }) => {
     wedding_date: `${formateDateToLocaleDateString(wedding?.wedding_date)}`,
     venue: `${wedding?.avenue}`,
     rsvp_date: `${formateDateToLocaleDateString(tenDaysLater)}`,
+    wedding_url: `${wedding_url}`,
   };
 
   const mailTemplate = template(templateVariables);

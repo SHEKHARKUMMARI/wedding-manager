@@ -10,5 +10,8 @@
         "server": "smtp.gmail.com",
         "port": "465",
         "security": "SSL"
+    },
+    "fe": {
+        "website_url": "https://wedding-manager-web-wm.vercel.app/"
     }
 }
