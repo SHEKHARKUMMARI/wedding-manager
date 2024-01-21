@@ -3,6 +3,7 @@ const Joi = require("joi");
 
 const { Photo } = require("../modals/photo");
 const { Dish } = require("../modals/dish");
+const { Comment } = require("../modals/comment");
 
 const { Schema, model } = mongoose;
 const weddingSchema = new Schema({
@@ -15,6 +16,8 @@ const weddingSchema = new Schema({
   guests: [{ type: Schema.ObjectId, ref: "User" }],
   wedding_date: { type: Date, required: true },
   avenue: { type: String, required: true },
+  likes: [{ type: Schema.ObjectId, ref: "User" }],
+  comments: [{ type: Schema.ObjectId, ref: Comment }],
   time_table: { type: String },
   created_by: { type: Schema.ObjectId, ref: "User" },
   created_on: { type: Date, default: Date.now() },
