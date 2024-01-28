@@ -11,4 +11,5 @@ const formateDateToLocaleDateString = (inputDateString) => {
   const inputDate = new Date(inputDateString);
   return inputDate.toLocaleDateString("en-US", options);
 };
+
 module.exports = { formateDateToLocaleDateString };

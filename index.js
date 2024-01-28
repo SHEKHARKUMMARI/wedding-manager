@@ -7,6 +7,7 @@ const weddings = require("./routes/weddings");
 const login = require("./routes/login");
 const mails = require("./routes/mails");
 const invitation = require("./routes/invitation");
+const comment = require("./routes/comment");
 const like = require("./routes/likes");
 
 const app = express();
@@ -43,6 +44,7 @@ app.use("/v1/login", login);
 app.use("/v1/mails", mails);
 app.use("/v1/invitation", invitation);
 app.use("/v1/likes", like);
+app.use("/v1/comments", comment);
 
 app.listen(PORT, () => {
   console.log(`connected to ${PORT}`);

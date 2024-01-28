@@ -5,12 +5,42 @@ const router = express.Router();
 const { Wedding, validateWedding } = require("../modals/wedding");
 const { Photo, validatePhotos } = require("../modals/photo");
 const { User } = require("../modals/user");
+const { Comment } = require("../modals/comment");
 const { auth } = require("../middleware/authorization");
 const { weddingInvitation } = require("../utils/mails");
 
 router.get("/", auth, async (req, res) => {
   const weddings = await Wedding.find();
   return res.status(200).send(weddings);
+});
+
+router.get("/my-weddings", auth, async (req, res) => {
+  const { user } = req;
+
+  try {
+    const id = new Types.ObjectId(user?.id);
+    const userData = await Wedding.findById(id)
+      .populate([
+        {
+          path: "my_weddings",
+          populate: [
+            {
+              path: "bribe groom",
+              model: User,
+              select: "-password",
+            },
+            {
+              path: "photo_gallery",
+              model: Photo,
+            },
+          ],
+        },
+      ])
+      .exec();
+    return res.status(200).send(userData?.my_weddings);
+  } catch (ex) {
+    return res.status(500).send(ex);
+  }
 });
 
 router.get("/my-wedding/:id", async (req, res) => {
@@ -49,12 +79,17 @@ router.get("/public", async (req, res) => {
       path: "photo_gallery",
       model: Photo,
     },
+    {
+      path: "wedding_description",
+      model: Comment,
+      select: "message",
+    },
   ]);
   return res.status(200).send(weddings);
 });
 
 router.post("/", auth, async (req, res) => {
-  const payload = req.body;
+  const { wedding_description, ...payload } = req.body;
   const { photo_gallery, ...weddingDetails } = payload || {};
   const { user } = req;
   const { error: weddingError } = validateWedding(weddingDetails);
@@ -79,6 +114,18 @@ router.post("/", auth, async (req, res) => {
     photo_gallery: savedPhotosIds,
   });
   const savedWedding = await wedding.save();
+
+  const weddingDescpayload = {
+    wedding: savedWedding?._id,
+    created_by: userId,
+    type: "description",
+    ...wedding_description,
+  };
+  const weddingDescription = new Comment(weddingDescpayload);
+  const savedWeddingComment = await weddingDescription?.save();
+  savedWedding.wedding_description = savedWeddingComment?._id;
+  await savedWedding.save();
+
   const currentUser = await User.findById(userId);
   currentUser.my_weddings = [
     ...(currentUser?.my_weddings || []),
@@ -86,35 +133,6 @@ router.post("/", auth, async (req, res) => {
   ];
   await currentUser.save();
   return res.status(200).send(savedWedding);
-});
-
-router.get("/my-weddings", auth, async (req, res) => {
-  const { user } = req;
-
-  try {
-    const id = new Types.ObjectId(user?.id);
-    const userData = await User.findById(id)
-      .populate([
-        {
-          path: "my_weddings",
-          populate: [
-            {
-              path: "bribe groom",
-              model: User,
-              select: "-password",
-            },
-            {
-              path: "photo_gallery",
-              model: Photo,
-            },
-          ],
-        },
-      ])
-      .exec();
-    return res.status(200).send(userData?.my_weddings);
-  } catch (ex) {
-    return res.status(500).send(ex);
-  }
 });
 
 router.put("/invite", auth, async (req, res) => {
