@@ -21,6 +21,7 @@ const weddingSchema = new Schema({
   comments: [{ type: Schema.ObjectId, ref: Comment }],
   time_table: { type: String },
   created_by: { type: Schema.ObjectId, ref: "User" },
+  managed_by: [{ type: Schema.ObjectId, ref: "User" }],
   created_on: { type: Date, default: Date.now() },
   updated_on: { type: Date, default: Date.now() },
   is_public: { type: Boolean, default: false },
@@ -36,6 +37,7 @@ const validateWedding = (data) => {
     wedding_date: Joi.date().required(),
     avenue: Joi.string().required(),
     wedding_description: Joi.string(),
+    managed_by: Joi.array().items(Joi.string()),
     is_public: Joi.boolean(),
   });
   return wedding.validate(data, { abortEarly: false });

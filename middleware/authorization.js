@@ -11,9 +11,24 @@ const auth = async (req, res, next) => {
   try {
     const decodedData = jwt.verify(token, jwtSecreteKey);
     req.user = decodedData;
-    next();
+    return next();
   } catch {
     return res.status(400).send("Invalid  token");
   }
 };
-module.exports = { auth };
+
+const profile = async (req, res, next) => {
+  const token = req.headers["x-auth-token"];
+  if (!token) {
+    req.user = {};
+    return next();
+  }
+  try {
+    const decodedData = jwt.verify(token, jwtSecreteKey);
+    req.user = decodedData;
+    return next();
+  } catch {
+    return res.status(400).send("Invalid  token");
+  }
+};
+module.exports = { auth, profile };

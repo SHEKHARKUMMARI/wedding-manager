@@ -6,7 +6,7 @@ const { Wedding, validateWedding } = require("../modals/wedding");
 const { Photo, validatePhotos } = require("../modals/photo");
 const { User } = require("../modals/user");
 const { Comment } = require("../modals/comment");
-const { auth } = require("../middleware/authorization");
+const { auth, profile } = require("../middleware/authorization");
 const { weddingInvitation } = require("../utils/mails");
 
 router.get("/", auth, async (req, res) => {
@@ -19,38 +19,7 @@ router.get("/my-weddings", auth, async (req, res) => {
 
   try {
     const id = new Types.ObjectId(user?.id);
-    const userData = await Wedding.findById(id)
-      .populate([
-        {
-          path: "my_weddings",
-          populate: [
-            {
-              path: "bribe groom",
-              model: User,
-              select: "-password",
-            },
-            {
-              path: "photo_gallery",
-              model: Photo,
-            },
-          ],
-        },
-      ])
-      .exec();
-    return res.status(200).send(userData?.my_weddings);
-  } catch (ex) {
-    return res.status(500).send(ex);
-  }
-});
-
-router.get("/my-wedding/:id", async (req, res) => {
-  const { id } = req.params || {};
-  if (!id) {
-    return res.status(400).send("Wedding Not Found");
-  }
-  const weddingID = new Types.ObjectId(id);
-  try {
-    const wedding = await Wedding.findById(weddingID).populate([
+    const weddings = await Wedding.find({ created_by: id }).populate([
       {
         path: "bribe groom",
         model: User,
@@ -61,8 +30,53 @@ router.get("/my-wedding/:id", async (req, res) => {
         model: Photo,
       },
     ]);
+    return res.status(200).send(weddings);
+  } catch (ex) {
+    return res.status(500).send(ex);
+  }
+});
+
+router.get("/my-wedding/:id", profile, async (req, res) => {
+  const { id } = req.params || {};
+
+  const user = req.user || {};
+
+  if (!id) {
+    return res.status(400).send("Wedding Not Found");
+  }
+  const weddingID = new Types.ObjectId(id);
+  try {
+    const wedding = await Wedding.findById(weddingID)
+      .populate([
+        {
+          path: "bribe groom",
+          model: User,
+          select: "-password",
+        },
+        {
+          path: "photo_gallery",
+          model: Photo,
+        },
+        {
+          path: "wedding_description",
+          model: Comment,
+          select: "message",
+        },
+      ])
+      .lean();
+    const canManage = wedding?.managed_by?.some((id) => {
+      const mangerId = new Types.ObjectId(id);
+      const userId = new Types.ObjectId(user?.id);
+      return mangerId?.equals(userId);
+    });
+
     if (!wedding) return res.status(400).send("please create  wedding");
-    return res.status(200).send(wedding);
+    const weddingWithAccessControl = {
+      ...(wedding || {}),
+      access_control: [...(canManage ? ["invite_guest"] : [])],
+    };
+
+    return res.status(200).send(weddingWithAccessControl);
   } catch (err) {
     res.status(500).send(err);
   }
@@ -90,7 +104,7 @@ router.get("/public", async (req, res) => {
 
 router.post("/", auth, async (req, res) => {
   const { wedding_description, ...payload } = req.body;
-  const { photo_gallery, ...weddingDetails } = payload || {};
+  const { photo_gallery, managed_by, ...weddingDetails } = payload || {};
   const { user } = req;
   const { error: weddingError } = validateWedding(weddingDetails);
   const { error: galleryError } = validatePhotos(photo_gallery);
@@ -112,6 +126,7 @@ router.post("/", auth, async (req, res) => {
     bribe: bribeId,
     created_by: userId,
     photo_gallery: savedPhotosIds,
+    managed_by: [...(managed_by || []), groomId, bribeId, userId],
   });
   const savedWedding = await wedding.save();
 
@@ -119,19 +134,12 @@ router.post("/", auth, async (req, res) => {
     wedding: savedWedding?._id,
     created_by: userId,
     type: "description",
-    ...wedding_description,
+    ...(wedding_description || { message: "Destination wedding" }),
   };
   const weddingDescription = new Comment(weddingDescpayload);
   const savedWeddingComment = await weddingDescription?.save();
   savedWedding.wedding_description = savedWeddingComment?._id;
   await savedWedding.save();
-
-  const currentUser = await User.findById(userId);
-  currentUser.my_weddings = [
-    ...(currentUser?.my_weddings || []),
-    savedWedding?._id,
-  ];
-  await currentUser.save();
   return res.status(200).send(savedWedding);
 });
 

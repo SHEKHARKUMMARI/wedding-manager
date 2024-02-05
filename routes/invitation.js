@@ -14,6 +14,44 @@ const { weddingInvitation } = require("../utils/mails");
 
 const router = express.Router();
 const WEB_URL = config.get(`fe.website_url`);
+
+router.get("/", auth, async (req, res) => {
+  const user = req?.user;
+  const userId = new Types.ObjectId(user?.id);
+  try {
+    const invitations = await Invitation.find({ guest_id: userId })?.populate({
+      path: "wedding_id",
+      model: Wedding,
+      populate: [
+        {
+          path: "groom bribe",
+          model: User,
+          select: "name surname",
+        },
+      ],
+      select: "title groom bribe wedding_date avenue",
+    });
+    const formatedInvitations = invitations?.map((invitation) => {
+      return {
+        status: invitation?.status,
+        _id: invitation?._id,
+        wedding: {
+          _id: invitation?.wedding_id?._id,
+          title: invitation?.wedding_id?.title,
+          venue: invitation?.wedding_id?.avenue,
+          wedding_date: invitation?.wedding_id?.wedding_date,
+          bride: `${invitation?.wedding_id?.bribe?.surname} ${invitation?.wedding_id?.bribe?.name}`,
+          groom: `${invitation?.wedding_id?.groom?.surname} ${invitation?.wedding_id?.groom?.name}`,
+        },
+        updated_on: invitation?.updated_on,
+      };
+    });
+    return res.status(200).send(formatedInvitations);
+  } catch (err) {
+    return res.status(500).send(err);
+  }
+});
+
 router.get("/wedding/:id/guests", async (req, res) => {
   const { id } = req.params;
   if (!id) return res.status(400).send("something went wrong");
