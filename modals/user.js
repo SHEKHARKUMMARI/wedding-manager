@@ -49,8 +49,8 @@ userSchema.methods.getJwtToken = function () {
 
 const validateUser = (data) => {
   const user = Joi.object({
-    name: Joi.string().min(3).max(20).required(),
-    surname: Joi.string().min(3).max(20).required(),
+    name: Joi.string().min(1).max(20).required(),
+    surname: Joi.string().min(1).max(20).required(),
     mobile: Joi.string().min(2).max(20).required(),
     password: Joi.string().min(2).max(20).required(),
     gender: Joi.string().valid("male", "female").required(),
@@ -61,7 +61,7 @@ const validateUser = (data) => {
         tlds: { allow: ["com"] },
       })
       .required(),
-    place: Joi.string().min(5).max(20).required(),
+    place: Joi.string().max(20).required(),
     family: Joi.object({
       father: Joi.string().allow(null, ""),
       mother: Joi.string().allow(null, ""),
